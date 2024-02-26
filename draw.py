@@ -20,7 +20,8 @@ audit_df.to_excel('Auditting.xlsx', index=False)
 print("Auditting DONE!")
 
 # =============== for Deduplicating ===============
-df = df[df['是否有加簽或旁聽意願'] != '我沒有要加簽，只要旁聽']
+# df = df[df['是否有加簽或旁聽意願'] != '我沒有要加簽，只要旁聽']
+df = df[(df['是否有加簽或旁聽意願'] != '我沒有要加簽，只要旁聽') & (df['是否有加簽或旁聽意願'] != '沒有要加簽，也沒有要旁聽') & (df['學號'] != '無') & (df['學號'] != '无') & (df['聯絡信箱'].str.contains('ntu.edu.tw'))]
 df = df.drop_duplicates(subset='學號', keep='first')
 
 # =============== for EECS and Art ===============
@@ -30,6 +31,6 @@ print("EECS and ART DONE!")
 
 # =============== for Others who wanna registry ===============
 others_df = df[df['系所 (含雙主修、輔系、學程)'] == '其他']
-selected_df = others_df.sample(n=min(10, len(others_df)), random_state=74774)
+selected_df = others_df.sample(n=min(50, len(others_df)), random_state=74774)
 selected_df.to_excel('Drawed_50.xlsx', index=False)
 print("Draw DONE!")
