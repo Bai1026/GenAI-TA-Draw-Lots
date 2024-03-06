@@ -19,40 +19,54 @@ EECS_df['學號'] = EECS_df['學號'].str.lower()
 
 # filter out TAs and 50 students that are already registered
 df = df[~df['學號'].isin(TA_df['學號'])]
+print(df.shape)
 df = df[~df['學號'].isin(EECS_df['學號'])]
+print(df.shape)
 df = df[~df['學號'].isin(drawed_df['學號'])]
+print(df.shape)
 df = df[['Email Address', '姓名', '學號', '聯絡信箱', '是否有加簽或旁聽意願', '如果沒有加簽到的話，需要加入旁聽嗎']]
 
 # =============== for wanting auditting ===============
 audit_df = df[((df['是否有加簽或旁聽意願'] == '我沒有要加簽，只要旁聽') | (df['如果沒有加簽到的話，需要加入旁聽嗎'] == '要'))]
-print(audit_df.head(10))
+print(audit_df.shape)
+# print(audit_df.head(10))
 print("Auditting DONE!")
 print()
 
 
 student_df = pd.read_excel('./student_list.xlsx')
+student_df = student_df[['身份', '學號', '姓名', '信箱']]
 student_df['學號'] = student_df['學號'].str.lower()
-student_df = student_df[['身份', '姓名', '信箱']]
 student_df = student_df[student_df['身份'] == '旁聽生']
 print("student list:")
-print(student_df.head(10))
-print()
+print(student_df.shape)
 
+audit_df = audit_df[~audit_df['聯絡信箱'].isin(student_df['信箱'])]
+print(audit_df.shape)
+print(audit_df.head(10))
+
+audit_emails = audit_df['聯絡信箱']
+print(audit_emails.shape)
+
+with open('audit_emails.txt', 'w') as f:
+    for email in audit_emails:
+        f.write(email + ', ')
+    print("file output at ", "audit_emails.txt")
 
 # Filter out the student already in the ntu cool
-audit_df['信箱'] = audit_df['Email Address'].str.lower()
-student_df['信箱'] = student_df['信箱'].str.lower()
+# audit_df['信箱'] = audit_df['Email Address'].str.lower()
+# student_df['信箱'] = student_df['信箱'].str.lower()
 
-merged_df = pd.merge(audit_df, student_df, on='信箱', how='left', indicator=True)
+# merged_df = pd.merge(audit_df, student_df, on='信箱', how='left', indicator=True)
 
-filtered_df = merged_df[merged_df['_merge'] == 'left_only']
+# filtered_df = merged_df[merged_df['_merge'] == 'left_only']
 
-print(filtered_df.head(10))
+# # print(filtered_df.head(10))
 
-filtered_emails = filtered_df['Email Address']
+# filtered_emails = filtered_df['Email Address']
 
-with open('filtered_emails.txt', 'w') as file:
-    for email in filtered_emails:
-        file.write(email + '\n')
+# with open('filtered_emails.txt', 'w') as file:
+#     for email in filtered_emails:
+#         file.write(email + '\n')
 
-print("Filtered emails saved to filtered_emails.txt")
+# print("Filtered emails saved to filtered_emails.txt")
